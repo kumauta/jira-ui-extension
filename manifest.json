@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Jira UI Extension",
+  "version": "0.2.0",
+  "description": "Jiraのコメントを自動展開し、右側の一覧からコメントへ移動できます。",
+  "content_scripts": [
+    {
+      "matches": ["https://*.atlassian.net/browse/*"],
+      "js": ["content.js", "comments-nav.js"],
+      "css": ["comments-nav.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

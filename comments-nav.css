@@ -1,0 +1,72 @@
+#jira-ui-comments-nav {
+  box-sizing: border-box;
+  margin: 24px 0 16px;
+  padding: 16px;
+  border: 1px solid var(--ds-border, #8590a24f);
+  border-radius: 8px;
+  background: var(--ds-surface, #fff);
+  color: var(--ds-text, #172b4d);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+#jira-ui-comments-nav .jira-ui-comments-heading {
+  margin: 0 0 12px;
+  color: var(--ds-text, #172b4d);
+  font: inherit;
+  font-weight: 600;
+}
+#jira-ui-comments-nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-radius: 4px;
+  padding: 8px;
+  color: var(--ds-text-subtle, #44546f);
+  text-decoration: none;
+}
+#jira-ui-comments-nav a:hover {
+  background: var(--ds-background-neutral-subtle-hovered, #091e420f);
+  color: var(--ds-link, #0c66e4);
+}
+#jira-ui-comments-nav a:focus-visible {
+  outline: 2px solid var(--ds-border-focused, #388bff);
+  outline-offset: 2px;
+}
+#jira-ui-comments-nav .jira-ui-comments-jump {
+  justify-content: center;
+  color: var(--ds-link, #0c66e4);
+  font-weight: 500;
+}
+#jira-ui-comments-nav .jira-ui-comments-list {
+  max-height: min(45vh, 440px);
+  margin: 8px 0;
+  padding: 8px 0;
+  border-block: 1px solid var(--ds-border, #8590a24f);
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+#jira-ui-comments-nav .jira-ui-comments-list li {
+  margin: 0;
+  padding: 0;
+}
+#jira-ui-comments-nav .jira-ui-comments-number {
+  min-width: 1.5em;
+  color: var(--ds-text-subtlest, #626f86);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+#jira-ui-comments-nav .jira-ui-comments-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#jira-ui-comments-nav .jira-ui-comments-empty {
+  margin: 0;
+  color: var(--ds-text-subtlest, #626f86);
+}
+[id^="jira-ui-comment-"] {
+  scroll-margin-top: 24px;
+}
