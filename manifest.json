@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jira UI Extension",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Jiraのコメントを自動展開し、右側の一覧からコメントへ移動できます。",
   "content_scripts": [
     {

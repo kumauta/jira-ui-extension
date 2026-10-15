@@ -11,10 +11,64 @@
   line-height: 1.5;
 }
 #jira-ui-comments-nav .jira-ui-comments-heading {
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--ds-text, #172b4d);
   font: inherit;
   font-weight: 600;
+}
+#jira-ui-comments-nav .jira-ui-comments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+#jira-ui-comments-nav .jira-ui-comments-toggle {
+  border: 0;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--ds-text-subtle, #44546f);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+#jira-ui-comments-nav .jira-ui-comments-toggle:hover {
+  background: var(--ds-background-neutral-subtle-hovered, #091e420f);
+}
+#jira-ui-comments-nav .jira-ui-comments-toggle:focus-visible {
+  outline: 2px solid var(--ds-border-focused, #388bff);
+  outline-offset: 2px;
+}
+#jira-ui-comments-nav .jira-ui-comments-jumps {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  margin-top: 4px;
+}
+#jira-ui-comments-nav [hidden] {
+  display: none;
+}
+#jira-ui-comments-nav[data-placement="compact"] {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 1;
+  width: min(440px, 100%);
+  margin: 0;
+  padding: 8px 12px;
+  box-shadow: var(--ds-shadow-overlay, 0 4px 12px #091e4226);
+}
+#jira-ui-comments-nav[data-placement="compact"] .jira-ui-comments-list {
+  box-sizing: border-box;
+  max-height: min(128px, 18vh);
+  margin: 4px 0 0;
+  padding: 4px 0;
+  border-bottom: 0;
+}
+#jira-ui-comments-nav[data-placement="compact"] a {
+  padding: 4px 8px;
+  font-size: 12px;
 }
 #jira-ui-comments-nav a {
   display: flex;

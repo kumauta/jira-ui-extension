@@ -9,6 +9,35 @@
   let timer;
   let signature = "";
   let nav;
+  let collapsed = false;
+  let observedSidebar;
+  const resizeObserver = new ResizeObserver(() => schedule());
+
+  function placement(panel, column) {
+    const sidebar = column?.closest('[data-testid="issue.views.issue-details.issue-layout.container-right"]') || column;
+    if (observedSidebar !== sidebar) {
+      resizeObserver.disconnect();
+      if (sidebar) resizeObserver.observe(sidebar);
+      observedSidebar = sidebar;
+    }
+    const rect = sidebar?.getBoundingClientRect();
+    if (sidebar?.checkVisibility({ visibilityProperty: true }) &&
+        !sidebar.closest('[aria-hidden="true"]') && rect.width > 48 && rect.right > 0 && rect.left < innerWidth) {
+      return { parent: column, mode: "sidebar" };
+    }
+
+    const editor = panel.querySelector('[data-testid="issue.activity.comment"]');
+    if (!editor) return null;
+    // Jira pins this wrapper to the bottom. Keep the navigator above the editor,
+    // outside its avatar/text flex row, so the draft and its controls stay intact.
+    for (let wrapper = editor.parentElement; wrapper && wrapper !== panel; wrapper = wrapper.parentElement) {
+      if (getComputedStyle(wrapper).position === "sticky") {
+        return { parent: wrapper, before: wrapper.firstElementChild, mode: "compact" };
+      }
+    }
+    const row = editor.parentElement;
+    return { parent: row.parentElement, before: row, mode: "compact" };
+  }
 
   function commentTitle(body) {
     const source = body.textContent;
@@ -50,7 +79,8 @@
     timer = undefined;
     const column = document.querySelector(columnSelector);
     const panel = document.querySelector(panelSelector);
-    if (!column || !panel) {
+    const destination = panel && placement(panel, column);
+    if (!destination) {
       nav?.remove();
       nav = undefined;
       signature = "";
@@ -67,29 +97,55 @@
       return [{ anchor, title: commentTitle(body) }];
     });
     const nextSignature = JSON.stringify([location.pathname, location.search, entries]);
-    if (nav?.isConnected && nav.parentElement === column && signature === nextSignature) return;
-
-    if (!nav?.isConnected || nav.parentElement !== column) {
-      nav?.remove();
+    if (!nav) {
       nav = document.createElement("nav");
       nav.id = navId;
       nav.setAttribute("aria-label", "コメントへの移動");
-      column.append(nav);
     }
+    nav.dataset.placement = destination.mode;
+    if (nav.parentElement !== destination.parent ||
+        (destination.before && destination.before !== nav && nav.nextElementSibling !== destination.before)) {
+      destination.parent.insertBefore(nav, destination.before || null);
+    }
+    if (signature === nextSignature && nav.childElementCount) return;
     signature = nextSignature;
+    const header = document.createElement("div");
+    header.className = "jira-ui-comments-header";
     const heading = document.createElement("h2");
     heading.className = "jira-ui-comments-heading";
     heading.textContent = `コメント (${entries.length})`;
-    nav.replaceChildren(heading);
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "jira-ui-comments-toggle";
+    toggle.setAttribute("aria-controls", "jira-ui-comments-content");
+    const content = document.createElement("div");
+    content.id = "jira-ui-comments-content";
+    function syncCollapsed() {
+      content.hidden = collapsed;
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.textContent = collapsed ? "展開" : "折りたたむ";
+      toggle.setAttribute("aria-label", collapsed ? "コメント一覧を展開" : "コメント一覧を折りたたむ");
+    }
+    toggle.addEventListener("click", () => {
+      collapsed = !collapsed;
+      syncCollapsed();
+    });
+    syncCollapsed();
+    header.append(heading, toggle);
+    nav.replaceChildren(header, content);
     if (!entries.length) {
       const empty = document.createElement("p");
       empty.className = "jira-ui-comments-empty";
       empty.textContent = "コメントはありません";
-      nav.append(empty);
+      content.append(empty);
       return;
     }
 
-    nav.append(link(entries[0], "最初のコメントへ", "jira-ui-comments-jump"));
+    const jumps = document.createElement("div");
+    jumps.className = "jira-ui-comments-jumps";
+    jumps.append(link(entries[0], "最初のコメントへ", "jira-ui-comments-jump"),
+      link(entries.at(-1), "最後のコメントへ", "jira-ui-comments-jump"));
+    content.append(jumps);
     const list = document.createElement("ol");
     list.className = "jira-ui-comments-list";
     entries.forEach((entry, index) => {
@@ -106,7 +162,7 @@
       row.append(anchor);
       list.append(row);
     });
-    nav.append(list, link(entries.at(-1), "最後のコメントへ", "jira-ui-comments-jump"));
+    content.append(list);
   }
 
   function schedule() {
@@ -122,8 +178,9 @@
     subtree: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ["aria-labelledby"],
+    attributeFilter: ["aria-labelledby", "style", "class", "hidden", "aria-hidden"],
   });
   window.addEventListener("popstate", schedule);
+  window.addEventListener("resize", schedule);
   schedule();
 })();
