@@ -143,7 +143,21 @@
 
     const jumps = document.createElement("div");
     jumps.className = "jira-ui-comments-jumps";
+    const pageTop = document.createElement("a");
+    pageTop.href = "#jira-page-layout-main";
+    pageTop.className = "jira-ui-comments-jump";
+    pageTop.textContent = "ページトップへ";
+    pageTop.addEventListener("click", event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      // Jira scrolls the issue column independently of the browser window.
+      for (let container = panel; container; container = container.parentElement) {
+        container.scrollTo({ top: 0, behavior: "instant" });
+      }
+      window.scrollTo({ top: 0, behavior: "instant" });
+    });
     jumps.append(link(entries[0], "最初のコメントへ", "jira-ui-comments-jump"),
+      pageTop,
       link(entries.at(-1), "最後のコメントへ", "jira-ui-comments-jump"));
     content.append(jumps);
     const list = document.createElement("ol");
